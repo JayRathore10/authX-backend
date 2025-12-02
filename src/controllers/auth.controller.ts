@@ -209,3 +209,16 @@ export const resetPassword = async (req : Request, res : Response)=>{
     return res.status(500).json({err});
   }
 }
+
+export const logOut = (req : Request, res : Response)=>{
+  try{
+    res.cookie("token" , "");
+    return res.status(200).json({
+      message : "Logout Successfully"
+    })
+  }catch(err){
+    return res.status(500).json({
+      err
+    })
+  }
+}
