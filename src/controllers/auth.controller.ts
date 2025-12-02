@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { config } from "../configs/config";
+import { authRequest } from "../types/authRequest";
 
 export const signUp = async(req : Request , res : Response)=>{
   try{
@@ -224,5 +225,34 @@ export const logOut = (req : Request, res : Response)=>{
     return res.status(500).json({
       err
     })
+  }
+}
+export const changePassword = async (req : authRequest , res : Response)=>{
+  try{
+    const email = req.user?.email ;
+    const {password} = req.body;
+
+    const user = await userModel.findOne({email});
+
+    if(!user){
+      return res.status(401).json({
+        message :  "Something Wrong Happens"
+      })
+    }
+
+    const hashedPassword = await encryptPassword(password);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    const token = jwt.sign({email : user.email} , config.jwtSecret);
+    res.cookie("token" , token);
+
+    return res.status(200).json({
+      message : "password change successfully"
+    })
+
+  }catch(err){
+    return res.status(500).json({err})
   }
 }
