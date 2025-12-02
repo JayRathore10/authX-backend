@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import { config } from "./config";
 
 export const connectDB = async()=>{
   try{
-    await mongoose.connect("mongodb://localhost:27017/authX");
+    const mongoUri = config.mongoUri;
+    await mongoose.connect(mongoUri);
     console.log("DB Connected Successfully");
   }catch(err){
     console.log(err);
