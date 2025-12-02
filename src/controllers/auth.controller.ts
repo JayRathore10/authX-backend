@@ -35,7 +35,7 @@ export const signUp = async(req : Request , res : Response)=>{
 
     });
 
-    const token = jwt.sign({email} , "secure");
+    const token = jwt.sign({email} ,config.jwtSecret);
 
     res.cookie("token" , token);
 
@@ -77,7 +77,7 @@ export const logIn = async(req : Request, res : Response)=>{
       })
     }
 
-    const token = jwt.sign({email} , "secure");
+    const token = jwt.sign({email} , config.jwtSecret);
 
     res.cookie("token" , token);
     return res.status(200).json({
