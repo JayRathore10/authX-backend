@@ -212,7 +212,11 @@ export const resetPassword = async (req : Request, res : Response)=>{
 
 export const logOut = (req : Request, res : Response)=>{
   try{
-    res.cookie("token" , "");
+    res.clearCookie("token" ,{
+      httpOnly : true , 
+      secure : true , 
+      sameSite: "strict"
+    })
     return res.status(200).json({
       message : "Logout Successfully"
     })
