@@ -13,7 +13,7 @@ app.use(cors());
 app.use("/api/auth" , authRouter);
 app.use("/api/user" , userRouter);
 
-app.get("/"  , (req : Request, res : Response)=>{
+app.get("/jexts"  , (req : Request, res : Response)=>{
   res.send("Hi, Jexts here!")
 })
 
