@@ -23,7 +23,7 @@ const config_1 = require("../configs/config");
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password, age } = req.body;
-        if (!name || !email || !password || !age) {
+        if (!name || !email || !password || age === undefined) {
             return res.status(401).json({
                 message: "Something Wrong happens"
             });
@@ -42,7 +42,11 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: hashedPassword
         });
         const token = jsonwebtoken_1.default.sign({ email }, config_1.config.jwtSecret);
-        res.cookie("token", token);
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         return res.status(200).json({
             message: "User Created",
             user
@@ -76,7 +80,11 @@ const logIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         const token = jsonwebtoken_1.default.sign({ email }, config_1.config.jwtSecret);
-        res.cookie("token", token);
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         return res.status(200).json({
             user
         });
@@ -222,7 +230,11 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         user.password = hashedPassword;
         yield user.save();
         const token = jsonwebtoken_1.default.sign({ email: user.email }, config_1.config.jwtSecret);
-        res.cookie("token", token);
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
         return res.status(200).json({
             message: "password change successfully"
         });
