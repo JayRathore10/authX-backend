@@ -31,3 +31,6 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+#my file
+task.md
