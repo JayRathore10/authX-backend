@@ -29,7 +29,7 @@ export const signUp = async (req: Request, res: Response) => {
       })
     }
 
-    if(record.optExpTime! < Date.now()){
+    if(record.optExpTime < Date.now()){
       return res.status(401).json({
         message : "OTP experies"
       })

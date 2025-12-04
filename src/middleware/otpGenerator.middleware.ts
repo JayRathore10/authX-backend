@@ -12,6 +12,8 @@ export const otpGenerator = async(req : Request , res : Response , next : NextFu
       return res.status(500).json({message : "Something Wrong Happens"});
     }
 
+    await emailVerifactionModel.deleteOne({ email });
+
     const otp = crypto.randomInt(1000 , 9999).toString();
 
     await emailVerifactionModel.create({
