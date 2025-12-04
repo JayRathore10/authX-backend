@@ -42,6 +42,7 @@ export const signUp = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      path : "/"
     });
 
     return res.status(200).json({
@@ -88,6 +89,7 @@ export const logIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      path : "/"
     });
     return res.status(200).json({
       user
@@ -224,7 +226,8 @@ export const logOut = (req: Request, res: Response) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: true,
-      sameSite: "strict"
+      sameSite: "strict" ,
+      path : "/"
     })
     return res.status(200).json({
       message: "Logout Successfully"
@@ -258,6 +261,7 @@ export const changePassword = async (req: authRequest, res: Response) => {
       httpOnly: true,
       secure: true,  
       sameSite: "none",   
+      path : "/"
     });
 
     return res.status(200).json({
