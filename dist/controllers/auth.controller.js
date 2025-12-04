@@ -46,6 +46,8 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true,
             sameSite: "none",
+            path: "/",
+            partitioned: true
         });
         return res.status(200).json({
             message: "User Created",
@@ -84,6 +86,8 @@ const logIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true,
             sameSite: "none",
+            path: "/",
+            partitioned: true,
         });
         return res.status(200).json({
             user
@@ -202,7 +206,9 @@ const logOut = (req, res) => {
         res.clearCookie("token", {
             httpOnly: true,
             secure: true,
-            sameSite: "strict"
+            sameSite: "strict",
+            path: "/",
+            partitioned: true
         });
         return res.status(200).json({
             message: "Logout Successfully"
@@ -234,6 +240,8 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             httpOnly: true,
             secure: true,
             sameSite: "none",
+            path: "/",
+            partitioned: true
         });
         return res.status(200).json({
             message: "password change successfully"

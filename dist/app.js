@@ -16,6 +16,10 @@ app.use((0, cors_1.default)({
     origin: "http://localhost:5173",
     credentials: true
 }));
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
 app.use("/api/auth", auth_routes_1.authRouter);
 app.use("/api/user", user_routes_1.userRouter);
 app.get("/", (req, res) => {
