@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema<Iuser>({
   password : String , 
   age : Number , 
   resetToken : String, 
-  resetTokenExpDate : Number
+  resetTokenExpDate : Number,
 });
 
 export const userModel = mongoose.model("user" , userSchema);

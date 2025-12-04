@@ -7,10 +7,11 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { config } from "../configs/config";
 import { authRequest } from "../types/authRequest";
+import { emailVerifactionModel } from "../models/emailVerfication.model";
 
 export const signUp = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, age } = req.body;
+    const { name, email, password, age , otp } = req.body;
 
     if (!name || !email || !password || age === undefined) {
       return res.status(401).json({
@@ -18,11 +19,25 @@ export const signUp = async (req: Request, res: Response) => {
       });
     }
 
-    const userExisted = await userModel.findOne({ email });
+    // checking otp 
 
-    if (userExisted) {
+    const record = await emailVerifactionModel.findOne({email});
+    
+    if(!record){
       return res.status(401).json({
-        message: "User Already Exist"
+        message : "Something Wrong Happens"
+      })
+    }
+
+    if(record.optExpTime! < Date.now()){
+      return res.status(401).json({
+        message : "OTP experies"
+      })
+    }
+
+    if(record.otp !== otp){
+      return res.status(401).json({
+        message : "You Enter the Wrong OTP"
       })
     }
 
@@ -33,7 +48,6 @@ export const signUp = async (req: Request, res: Response) => {
       age,
       email,
       password: hashedPassword
-
     });
 
     const token = jwt.sign({ email }, config.jwtSecret);
@@ -45,6 +59,8 @@ export const signUp = async (req: Request, res: Response) => {
       path : "/" , 
       partitioned : true 
     });
+
+    await emailVerifactionModel.deleteOne({email});
 
     return res.status(200).json({
       message: "User Created",
@@ -129,7 +145,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
 
     await user.save();
 
-    const resetLink = `http://localhost:3000/api/auth/reset-password/${token}`;
+    const resetLink = `https://authx-backend-yyep.onrender.com/api/auth/reset-password/${token}`;
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -274,5 +290,15 @@ export const changePassword = async (req: authRequest, res: Response) => {
 
   } catch (err) {
     return res.status(500).json({ err })
+  }
+}
+
+export const verifyOTP = (req : Request, res : Response)=>{
+  try{
+    return res.status(200).json({
+      otp : req.params
+    })
+  }catch(err){  
+    return res.status(500).json({err});
   }
 }
