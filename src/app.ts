@@ -15,6 +15,8 @@ app.use(cors(
   }
 ));
 
+app.set("trust proxy", 1);
+
 app.use((req : Request, res : Response , next : NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
