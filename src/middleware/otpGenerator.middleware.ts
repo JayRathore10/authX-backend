@@ -1,44 +1,44 @@
-import { Request , Response , NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { emailVerifactionModel } from "../models/emailVerfication.model";
 import crypto from "crypto";
 import { encryptPassword } from "../utils/encryptPassword";
 import nodemailer from 'nodemailer';
 import { config } from "../configs/config";
+import { userModel } from "../models/user.model";
 
-export const otpGenerator = async(req : Request , res : Response , next : NextFunction)=>{
-  try{  
-    const {email} = req.body;
-    if(!email){
-      return res.status(500).json({message : "Something Wrong Happens"});
+export const otpGenerator = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(500).json({ message: "Something Wrong Happens" });
     }
-
     await emailVerifactionModel.deleteOne({ email });
 
-    const otp = crypto.randomInt(1000 , 9999).toString();
+    const otp = crypto.randomInt(1000, 9999).toString();
 
     await emailVerifactionModel.create({
-      otp ,
-      email , 
-      optExpTime : Date.now() + 5 * 60 * 1000
+      otp,
+      email,
+      optExpTime: Date.now() + 5 * 60 * 1000
     });
 
     const verifyLink = `https://authx-backend-yyep.onrender.com/api/auth/verify-otp/${otp}`
 
     const transporter = nodemailer.createTransport({
-      host : "smtp.gmail.com" , 
-      port : 465 , 
-      secure : true , 
-      auth : {
-        user: config.myEmail , 
-        pass : config.myEmailPassword
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: config.myEmail,
+        pass: config.myEmailPassword
       }
     })
 
     await transporter.sendMail({
-      from:"gmail" , 
-      to : email , 
-      subject: "OTP Verification" , 
-       html: `
+      from: "gmail",
+      to: email,
+      subject: "OTP Verification",
+      html: `
         <h3>OTP Verification</h3>
         <p>Click the link below to get your OTP</p>
         <a href="${verifyLink}">${verifyLink}</a>
@@ -48,7 +48,7 @@ export const otpGenerator = async(req : Request , res : Response , next : NextFu
 
     next();
 
-  }catch(err){
-    return res.status(500).json({err});
+  } catch (err) {
+    return res.status(500).json({ err });
   }
 }

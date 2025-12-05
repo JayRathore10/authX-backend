@@ -11,33 +11,32 @@ import { emailVerifactionModel } from "../models/emailVerfication.model";
 
 export const signUp = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, age , otp } = req.body;
+    const { name, email, password, age, otp } = req.body;
 
     if (!name || !email || !password || age === undefined) {
       return res.status(401).json({
         message: "Something Wrong happens"
       });
     }
-
     // checking otp 
 
-    const record = await emailVerifactionModel.findOne({email});
-    
-    if(!record){
+    const record = await emailVerifactionModel.findOne({ email });
+
+    if (!record) {
       return res.status(401).json({
-        message : "Something Wrong Happens"
+        message: "Something Wrong Happens"
       })
     }
 
-    if(record.optExpTime < Date.now()){
+    if (record.optExpTime < Date.now()) {
       return res.status(401).json({
-        message : "OTP experies"
+        message: "OTP experies"
       })
     }
 
-    if(record.otp !== otp){
+    if (record.otp !== otp) {
       return res.status(401).json({
-        message : "You Enter the Wrong OTP"
+        message: "You Enter the Wrong OTP"
       })
     }
 
@@ -56,11 +55,11 @@ export const signUp = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path : "/" , 
-      partitioned : true 
+      path: "/",
+      partitioned: true
     });
 
-    await emailVerifactionModel.deleteOne({email});
+    await emailVerifactionModel.deleteOne({ email });
 
     return res.status(200).json({
       message: "User Created",
@@ -106,8 +105,8 @@ export const logIn = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path : "/" , 
-      partitioned: true ,
+      path: "/",
+      partitioned: true,
     });
     return res.status(200).json({
       user
@@ -244,9 +243,9 @@ export const logOut = (req: Request, res: Response) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: true,
-      sameSite: "strict" ,
-      path : "/" , 
-      partitioned : true 
+      sameSite: "strict",
+      path: "/",
+      partitioned: true
     })
     return res.status(200).json({
       message: "Logout Successfully"
@@ -278,10 +277,10 @@ export const changePassword = async (req: authRequest, res: Response) => {
     const token = jwt.sign({ email: user.email }, config.jwtSecret);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,  
-      sameSite: "none",   
-      path : "/" , 
-      partitioned : true 
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      partitioned: true
     });
 
     return res.status(200).json({
@@ -293,19 +292,50 @@ export const changePassword = async (req: authRequest, res: Response) => {
   }
 }
 
-export const verifyOTP = (req : Request, res : Response)=>{
-  try{
+export const verifyOTP = (req: Request, res: Response) => {
+  try {
     return res.status(200).json({
-      otp : req.params
+      otp: req.params
     })
-  }catch(err){  
-    return res.status(500).json({err});
+  } catch (err) {
+    return res.status(500).json({ err });
   }
 }
 
-export const checkOtp = (req : Request , res : Response)=>{
+export const checkOtp = (req: Request, res: Response) => {
+  try {
+    return res.status(200).json({ message: "Otp sended" })
+  } catch (err) {
+    return res.status(500).json({ err });
+  }
+}
+
+export const isUserExist = async(req : Request , res : Response)=>{
   try{
-    return res.status(200).json({message : "Otp sended"})
+
+    const {email , name , age , password} = req.body;
+
+    if(!email || age === undefined || !name || !password){
+      return res.status(401).json({
+        name  , 
+        age ,  
+        email , 
+        password , 
+        message : ' Something Wrong Happens'
+      });
+    }
+
+    const user = await userModel.findOne({email});
+
+    if(user){
+      return res.status(401).json({
+        message : "User Already Exist" , 
+        exist : true 
+      })
+    }
+    return res.status(200).json({
+      exist : false 
+    })
   }catch(err){
     return res.status(500).json({err});
   }
