@@ -302,3 +302,11 @@ export const verifyOTP = (req : Request, res : Response)=>{
     return res.status(500).json({err});
   }
 }
+
+export const checkOtp = (req : Request , res : Response)=>{
+  try{
+    return res.status(200).json({message : "Otp sended"})
+  }catch(err){
+    return res.status(500).json({err});
+  }
+}
