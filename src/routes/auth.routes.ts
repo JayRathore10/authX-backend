@@ -11,6 +11,7 @@ authRouter.post("/login", logIn);
 authRouter.post("/forget-password" , forgetPassword);
 authRouter.get("/logout" , isLoggedIn , logOut);
 authRouter.post("/change-password", isLoggedIn , changePassword);
+authRouter.post("/otp-generator" , otpGenerator , verifyOTP);
 authRouter.post("/reset-password/:token" , resetPassword);
 authRouter.get("/reset-password/:token" , verifyResetToken);
 authRouter.get("/verify-otp/:otp" ,verifyOTP);

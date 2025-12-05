@@ -26,7 +26,7 @@ export const otpGenerator = async(req : Request , res : Response , next : NextFu
 
     const transporter = nodemailer.createTransport({
       host : "smtp.gmail.com" , 
-      port : 464 , 
+      port : 465 , 
       secure : true , 
       auth : {
         user: config.myEmail , 
