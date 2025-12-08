@@ -119,7 +119,7 @@ export const logIn = async (req: Request, res: Response) => {
   }
 }
 
-export const forgetPassword = async (req: Request, res: Response) => {
+export const  forgetPassword = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
@@ -137,14 +137,14 @@ export const forgetPassword = async (req: Request, res: Response) => {
       })
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
+    const token = crypto.randomInt(1000, 9999).toString();
 
     user.resetToken = token;
     user.resetTokenExpDate = Date.now() + 1000 * 60 * 5;
 
     await user.save();
 
-    const resetLink = `https://authx-backend-yyep.onrender.com/api/auth/reset-password/${token}`;
+    // const resetLink = `https://authx-backend-yyep.onrender.com/api/auth/reset-password/${token}`;
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -162,13 +162,14 @@ export const forgetPassword = async (req: Request, res: Response) => {
       subject: "Reset Password",
       html: `
         <h3>Password Reset Request</h3>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>This link will expire in 5 minutes.</p>
+        <p>OTP to reset your password:</p>
+        <p>${token}</p>
+        <p>This OTP will expire in 5 minutes.</p>
       `,
     })
 
     return res.status(200).json({
+      token : token ,
       message: "Password reset link sent to your email"
     })
 
