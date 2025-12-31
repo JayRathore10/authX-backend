@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePassword = exports.logOut = exports.resetPassword = exports.verifyResetToken = exports.forgetPassword = exports.logIn = exports.signUp = void 0;
+exports.isUserExist = exports.checkOtp = exports.verifyOTP = exports.changePassword = exports.logOut = exports.resetPassword = exports.verifyResetToken = exports.forgetPassword = exports.logIn = exports.signUp = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_model_1 = require("../models/user.model");
 const encryptPassword_1 = require("../utils/encryptPassword");
@@ -20,18 +20,30 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = require("../configs/config");
+const emailVerfication_model_1 = require("../models/emailVerfication.model");
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password, age } = req.body;
+        const { name, email, password, age, otp } = req.body;
         if (!name || !email || !password || age === undefined) {
             return res.status(401).json({
                 message: "Something Wrong happens"
             });
         }
-        const userExisted = yield user_model_1.userModel.findOne({ email });
-        if (userExisted) {
+        // checking otp 
+        const record = yield emailVerfication_model_1.emailVerifactionModel.findOne({ email });
+        if (!record) {
             return res.status(401).json({
-                message: "User Already Exist"
+                message: "Something Wrong Happens"
+            });
+        }
+        if (record.optExpTime < Date.now()) {
+            return res.status(401).json({
+                message: "OTP experies"
+            });
+        }
+        if (record.otp !== otp) {
+            return res.status(401).json({
+                message: "You Enter the Wrong OTP"
             });
         }
         const hashedPassword = yield (0, encryptPassword_1.encryptPassword)(password);
@@ -49,6 +61,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             path: "/",
             partitioned: true
         });
+        yield emailVerfication_model_1.emailVerifactionModel.deleteOne({ email });
         return res.status(200).json({
             message: "User Created",
             user
@@ -114,11 +127,11 @@ const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 message: "User not found"
             });
         }
-        const token = crypto_1.default.randomBytes(32).toString("hex");
+        const token = crypto_1.default.randomInt(1000, 9999).toString();
         user.resetToken = token;
         user.resetTokenExpDate = Date.now() + 1000 * 60 * 5;
         yield user.save();
-        const resetLink = `http://localhost:3000/api/auth/reset-password/${token}`;
+        // const resetLink = `https://authx-backend-yyep.onrender.com/api/auth/reset-password/${token}`;
         const transporter = nodemailer_1.default.createTransport({
             host: "smtp.gmail.com",
             port: 465,
@@ -134,12 +147,13 @@ const forgetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             subject: "Reset Password",
             html: `
         <h3>Password Reset Request</h3>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>This link will expire in 5 minutes.</p>
+        <p>OTP to reset your password:</p>
+        <p>${token}</p>
+        <p>This OTP will expire in 5 minutes.</p>
       `,
         });
         return res.status(200).json({
+            token: token,
             message: "Password reset link sent to your email"
         });
     }
@@ -193,7 +207,8 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         user.resetTokenExpDate = undefined;
         yield user.save();
         return res.status(200).json({
-            message: "Password reset successfully"
+            message: "Password reset successfully",
+            userData: user
         });
     }
     catch (err) {
@@ -252,3 +267,51 @@ const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.changePassword = changePassword;
+const verifyOTP = (req, res) => {
+    try {
+        return res.status(200).json({
+            otp: req.params
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ err });
+    }
+};
+exports.verifyOTP = verifyOTP;
+const checkOtp = (req, res) => {
+    try {
+        return res.status(200).json({ message: "Otp sended" });
+    }
+    catch (err) {
+        return res.status(500).json({ err });
+    }
+};
+exports.checkOtp = checkOtp;
+const isUserExist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, name, age, password } = req.body;
+        if (!email || age === undefined || !name || !password) {
+            return res.status(401).json({
+                name,
+                age,
+                email,
+                password,
+                message: ' Something Wrong Happens'
+            });
+        }
+        const user = yield user_model_1.userModel.findOne({ email });
+        if (user) {
+            return res.status(401).json({
+                message: "User Already Exist",
+                exist: true
+            });
+        }
+        return res.status(200).json({
+            exist: false
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ err });
+    }
+});
+exports.isUserExist = isUserExist;
