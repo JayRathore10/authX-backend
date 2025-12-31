@@ -49,7 +49,7 @@ const otpGenerator = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
           <p>This link will expire in 5 minutes.</p>
         `,
         });
-        next();
+        return res.status(200).json({ message: "Otp sended" });
     }
     catch (err) {
         return res.status(500).json({ err });
