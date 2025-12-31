@@ -25,17 +25,15 @@
       const verifyLink = `https://authx-backend-yyep.onrender.com/api/auth/verify-otp/${otp}`
 
       const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
+        service: "gmail",
         auth: {
           user: config.myEmail,
-          pass: config.myEmailPassword
-        }
+          pass: config.myEmailPassword,
+        },
       })
 
       await transporter.sendMail({
-        from: "gmail",
+        from: config.myEmail,
         to: email,
         subject: "OTP Verification",
         html: `
