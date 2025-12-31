@@ -19,8 +19,7 @@ export const signUp = async (req: Request, res: Response) => {
       });
     }
     // checking otp 
-
-    const record = await emailVerifactionModel.findOne({ email });
+    const record = await emailVerifactionModel.findOne({ email});
 
     if (!record) {
       return res.status(401).json({
