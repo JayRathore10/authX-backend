@@ -21,7 +21,7 @@ const otpGenerator = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const { email } = req.body;
         if (!email) {
-            return res.status(500).json({ message: "Something Wrong Happens" });
+            return res.status(400).json({ message: "Email is required" });
         }
         yield emailVerfication_model_1.emailVerifactionModel.deleteOne({ email });
         const otp = crypto_1.default.randomInt(1000, 9999).toString();
@@ -32,24 +32,22 @@ const otpGenerator = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         });
         const verifyLink = `https://authx-backend-yyep.onrender.com/api/auth/verify-otp/${otp}`;
         const transporter = nodemailer_1.default.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
+            service: "gmail",
             auth: {
                 user: config_1.config.myEmail,
-                pass: config_1.config.myEmailPassword
-            }
+                pass: config_1.config.myEmailPassword,
+            },
         });
         yield transporter.sendMail({
-            from: "gmail",
+            from: config_1.config.myEmail,
             to: email,
             subject: "OTP Verification",
             html: `
-        <h3>OTP Verification</h3>
-        <p>Click the link below to get your OTP</p>
-        <a href="${verifyLink}">${verifyLink}</a>
-        <p>This link will expire in 5 minutes.</p>
-      `,
+          <h3>OTP Verification</h3>
+          <p>Click the link below to get your OTP</p>
+          <a href="${verifyLink}">${verifyLink}</a>
+          <p>This link will expire in 5 minutes.</p>
+        `,
         });
         next();
     }
