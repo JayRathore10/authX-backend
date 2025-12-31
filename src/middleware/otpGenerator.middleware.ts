@@ -7,6 +7,7 @@ import { config } from "../configs/config";
 import { userModel } from "../models/user.model";
 import { Resend } from "resend";
 
+
 // export const otpGenerator = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
 //     const { email } = req.body;

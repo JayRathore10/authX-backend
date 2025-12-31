@@ -8,12 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended : true}));
-app.use(cors(
-  {
-    origin: "http://localhost:5173" ,
-    credentials: true
-  }
-));
+
+app.use(cors({
+  origin: "https://auth-x-frontend-iota.vercel.app",
+  credentials: true
+}));
 
 app.set("trust proxy", 1);
 
